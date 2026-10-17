@@ -5,15 +5,13 @@ import {
   authTokens, courses, enrollments, grades, messages, programs, sessions, submissions, trackTeachers, tracks, users,
 } from "@/db/schema";
 import { conflict, forbidden, notFound, validationError } from "@/lib/errors";
-import { generateToken, hashPassword, hashToken } from "@/lib/crypto";
+import { generateToken, hashToken } from "@/lib/crypto";
 import { fullName } from "@/lib/utils";
 import type { Role, SessionUser } from "@/server/auth";
 import { audit } from "./audit";
 import { notify } from "./notifications";
-import { getSettings } from "./settings";
 
 type Actor = Pick<SessionUser, "id" | "role">;
-type User = typeof users.$inferSelect;
 
 const ROLE_LABEL: Record<Role, string> = { student: "Learner", teacher: "Teacher", super_admin: "Super admin" };
 
@@ -35,27 +33,6 @@ export async function issueToken(userId: string, purpose: "verify_email" | "rese
   const token = generateToken();
   await conn.insert(authTokens).values({ userId, purpose, tokenHash: hashToken(token), expiresAt: new Date(Date.now() + hours * 3600_000) });
   return token;
-}
-
-/**
- * Public registration. The role is hard-coded to "student" here — the form
- * schema has no role field, and nothing a client sends can change this line.
- */
-export async function registerStudent(input: { firstName: string; lastName: string; email: string; password: string }): Promise<User> {
-  if (await emailTaken(input.email)) throw conflict("An account with that email already exists.");
-  const passwordHash = await hashPassword(input.password);
-  const user = await transaction(async (tx) => {
-    const [u] = await tx.insert(users).values({
-      email: input.email, passwordHash, firstName: input.firstName, lastName: input.lastName, role: "student", emailVerifiedAt: new Date(),
-    }).returning();
-    if ((await getSettings(tx)).autoEnrollNewStudents) await enrollInCurrent(u.id, tx);
-    await notify(tx, [{
-      recipientId: u.id, type: "system", title: "Welcome to Dream Chasers Community",
-      body: "Start with your dashboard to see this week's course and what's due.", link: "/learn", dedupeKey: "welcome",
-    }]);
-    return u;
-  });
-  return user;
 }
 
 /** Admin-created account. The person sets their own password from a link the admin shares. */

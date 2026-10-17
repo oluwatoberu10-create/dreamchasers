@@ -134,7 +134,6 @@ export function TrackTeacherAssign({ trackId, assigned, staff }: { trackId: stri
 export function PlatformForm({ initial }: { initial: { notifyAdminsOnSubmission: boolean; teacherJournalAccess: boolean; autoEnrollNewStudents: boolean; allowRevisitPastCourses: boolean; deadlineReminderHours: number } }) {
   return (
     <ActionForm action={saveSettingsAction} className="space-y-4">
-      <Checkbox name="autoEnrollNewStudents" defaultChecked={initial.autoEnrollNewStudents} label="Enrol new registrations automatically" hint="Into the current programme. Otherwise an admin enrols them." />
       <Checkbox name="teacherJournalAccess" defaultChecked={initial.teacherJournalAccess} label="Teachers can read completed journal entries" hint="Drafts are always private. Learners are told whether teachers can read their reflections." />
       <Checkbox name="notifyAdminsOnSubmission" defaultChecked={initial.notifyAdminsOnSubmission} label="Notify super admins of every submission" />
       <Checkbox name="allowRevisitPastCourses" defaultChecked={initial.allowRevisitPastCourses} label="Learners can reopen earlier weeks' courses" hint="Courses a learner has been asked to repeat always stay open." />

@@ -23,8 +23,7 @@ export default async function Landing() {
             <ButtonLink href={homeFor(user)} variant="star" size="sm">Go to your dashboard</ButtonLink>
           ) : (
             <>
-              <ButtonLink href="/login" variant="ghost" size="sm" className="text-[#c3c8e6] hover:bg-white/10 hover:text-white">Sign in</ButtonLink>
-              <ButtonLink href="/register" variant="star" size="sm">Join free</ButtonLink>
+              <ButtonLink href="/login" variant="star" size="sm">Sign in</ButtonLink>
             </>
           )}
         </nav>
@@ -43,8 +42,7 @@ export default async function Landing() {
             Dream Chasers Community brings weekly courses, assignments, teacher feedback, progress tracking and reflection into one place — for a focused three-month programme.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <ButtonLink href={user ? homeFor(user) : "/register"} variant="star" size="lg">{user ? "Continue learning" : "Create your free account"}</ButtonLink>
-            {!user && <ButtonLink href="/login" variant="secondary" size="lg" className="border-white/20 bg-white/5 text-white hover:bg-white/10">I already have an account</ButtonLink>}
+            <ButtonLink href={user ? homeFor(user) : "/login"} variant="star" size="lg">{user ? "Continue learning" : "Sign in"}</ButtonLink>
           </div>
         </div>
       </section>

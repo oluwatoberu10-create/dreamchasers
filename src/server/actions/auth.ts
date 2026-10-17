@@ -8,25 +8,12 @@ import { authTokens, sessions, users } from "@/db/schema";
 import { hashPassword, hashToken, verifyPassword } from "@/lib/crypto";
 import { AppError } from "@/lib/errors";
 import type { ActionState } from "@/lib/action-state";
-import { changePasswordSchema, loginSchema, passwordSchema, profileSchema, registerSchema } from "@/lib/validation";
+import { changePasswordSchema, loginSchema, passwordSchema, profileSchema } from "@/lib/validation";
 import { safeInternalPath } from "@/lib/utils";
 import { clientIp, createSession, destroySession, homeFor, requireUser } from "@/server/auth";
 import { audit } from "@/server/services/audit";
 import { enforce } from "@/server/services/rate-limit";
-import { registerStudent } from "@/server/services/users";
 import { parse, run } from "./run";
-
-export async function registerAction(_: ActionState, fd: FormData): Promise<ActionState> {
-  const result = await run(async () => {
-    await enforce(`register:${await clientIp()}`, 10, 3600, "Too many sign-ups from this network. Try again later.");
-    // registerSchema has no role field; registerStudent hard-codes "student".
-    const input = parse(registerSchema, fd);
-    const user = await registerStudent(input);
-    await createSession(user.id);
-  });
-  if (result.ok) redirect("/learn");
-  return result;
-}
 
 const DUMMY_HASH = "scrypt$00000000000000000000000000000000$" + "0".repeat(128);
 

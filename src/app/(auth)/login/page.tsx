@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser, homeFor } from "@/server/auth";
 import { safeInternalPath } from "@/lib/utils";
@@ -16,7 +15,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
       <p className="mt-1.5 text-[14px] text-[var(--text-muted)]">Sign in to pick up where you left off.</p>
       <div className="mt-7"><LoginForm next={safeInternalPath(next, "") || undefined} /></div>
       <p className="mt-6 text-center text-[13.5px] text-[var(--text-muted)]">
-        New here? <Link href="/register" className="font-semibold text-[var(--brand)] hover:underline">Create an account</Link>
+        No account yet? Your programme administrator creates it and sends you a link to set your password.
       </p>
     </>
   );

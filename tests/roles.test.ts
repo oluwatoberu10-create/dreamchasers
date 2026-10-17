@@ -2,31 +2,32 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import * as s from "@/db/schema";
-import { registerSchema } from "@/lib/validation";
 import { canViewStudent, isEnrolled } from "@/server/policy";
-import { changeRole, deleteUser, registerStudent, setAccountStatus } from "@/server/services/users";
+import { adminCreateUser, changeRole, deleteUser, setAccountStatus } from "@/server/services/users";
 import { closePool } from "@/db/migrate";
 import { user, wipe, world } from "./helpers";
 
 beforeAll(wipe);
 afterAll(closePool);
 
-describe("registration and roles", () => {
-  it("public registration creates an enrolled learner, without approval", async () => {
+describe("accounts and roles", () => {
+  it("only a super admin can add people; added learners are enrolled and set their own password", async () => {
     const w = await world();
-    const u = await registerStudent({ firstName: "New", lastName: "Person", email: "new.person@test.local", password: "long-enough-password" });
+    const input = { firstName: "New", lastName: "Person", email: "new.person@test.local", role: "student" as const };
+    await expect(adminCreateUser(w.teacher, input)).rejects.toThrow(/super admins/i);
+    await expect(adminCreateUser(w.alice, { ...input, role: "super_admin" })).rejects.toThrow(/super admins/i);
+
+    const { user: u, invitePath } = await adminCreateUser(w.admin, input);
     expect(u.role).toBe("student");
     expect(u.status).toBe("active");
+    expect(u.passwordHash.startsWith("unset$")).toBe(true);
+    expect(invitePath).toMatch(/^\/reset-password\/.{20,}/);
     expect(await isEnrolled(u.id, w.program.id)).toBe(true);
   });
 
-  it("a role posted with the registration form is discarded", () => {
-    const parsed = registerSchema.parse({ firstName: "Eve", lastName: "X", email: "eve@test.local", password: "long-enough-password", role: "super_admin" });
-    expect(parsed).not.toHaveProperty("role");
-  });
-
   it("rejects a duplicate email regardless of case", async () => {
-    await expect(registerStudent({ firstName: "A", lastName: "B", email: "NEW.PERSON@test.local", password: "long-enough-password" })).rejects.toThrow(/already exists/);
+    const w = await world();
+    await expect(adminCreateUser(w.admin, { firstName: "A", lastName: "B", email: "NEW.PERSON@test.local", role: "student" })).rejects.toThrow(/already exists/);
   });
 
   it("learners and teachers cannot change roles", async () => {

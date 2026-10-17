@@ -236,7 +236,7 @@ export async function saveSettingsAction(_: ActionState, fd: FormData): Promise<
   return run(async () => {
     const actor = await requireAdmin();
     const v = parse(z.object({
-      notifyAdminsOnSubmission: checkbox, teacherJournalAccess: checkbox, autoEnrollNewStudents: checkbox,
+      notifyAdminsOnSubmission: checkbox, teacherJournalAccess: checkbox,
       allowRevisitPastCourses: checkbox, deadlineReminderHours: intField(1, 168),
     }), fd);
     await saveSettings(v, actor.id);

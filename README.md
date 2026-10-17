@@ -6,7 +6,7 @@ A learning community platform for a weekly, three-month programme: teachers publ
 
 | Area | Highlights |
 |---|---|
-| **Accounts** | Public registration (always a *learner*), login, logout, profile & password change, admin-issued set-password and reset links, session revocation, rate limiting |
+| **Accounts** | No public sign-up: only super admins add people (they get a set-password link). Login, logout, profile & password change, admin-issued set-password and reset links, session revocation, rate limiting |
 | **Roles** | Learner, Teacher, Super Admin. Super admins teach from the same account. Every check is server-side, re-reading the role from the database on each request |
 | **Programme** | Configurable start date, 1–26 weeks (12/13 presets), timezone, week-start day; tracks (subjects) with assigned teachers; one expected course per track per week |
 | **Courses** | Track optional (a course without one gets its own); draft → scheduled → published → archived; Markdown lessons (XSS-safe renderer), objectives, evaluation criteria, private file uploads, links/videos, learner preview |
@@ -47,7 +47,7 @@ The database starts **empty** — there is no demo or sample data. To get going:
 
 1. In a second terminal, create your super admin: `npm run admin:create -- --email you@yourdomain.com` (see below).
 2. Sign in, then in *Admin → Settings* create the programme, add tracks and assign teachers.
-3. Teachers and learners register at `/register` (learners by default); promote teachers from *Admin → Users*.
+3. Add teachers and learners under *Admin → Users → Add user*, and share each person's set-password link with them.
 
 ### Useful scripts
 
@@ -73,7 +73,7 @@ There are no default administrator credentials anywhere. In any environment:
 DATABASE_URL=... npm run admin:create -- --email you@yourdomain.com --first Your --last Name
 ```
 
-- If the account exists (e.g. you registered through the site), it is promoted.
+- If the account exists (e.g. an admin added it), it is promoted.
 - Otherwise it is created with a **random one-time password printed once to your terminal** (never stored in plain text). Sign in and change it under *Profile*.
 
 After that, manage all roles from **Admin → Users**. Accounts an admin creates get a one-time set-password link (valid 7 days) for the admin to share. The database itself refuses to demote or deactivate the last active super admin.
@@ -93,11 +93,11 @@ Defined once in `src/lib/progress.ts` and `src/lib/status.ts`, and used by every
 ## Security
 
 - **Authorization lives in one module**, `src/server/policy.ts`, called by every page, server action and API route. IDs are never trusted from the client as proof of anything: the user, their role and their scope come from the database.
-- **Public registration cannot grant privileges**: the registration schema has no role field, and the insert hard-codes `student` (covered by a test).
+- **No public sign-up**: there is no registration page or action. Only a super admin can create accounts, enforced in the service layer (covered by a test).
 - **Database-level guards** (`drizzle/0001_guards.sql` plus CHECK constraints): scores within 0..max, pass ≤ max, pass/fail consistent with the score, only active teachers/admins can be recorded as graders, attempts must be submitted before grading, the last super admin can't be removed, one journal entry per learner per week, one submission record per learner per assignment, one active repeat per learner and course, notification deduplication.
 - **Row Level Security** is not used. The browser never talks to the database, so every query runs in server code after the policy checks above, and is covered by integration tests for all three roles.
 - **Files** are never public. `/api/files/[id]` checks the viewer may see the owning course or submission, returns 404 otherwise, and serves with `nosniff`, a sandboxing CSP, and attachment disposition unless the type is inline-safe. Uploads are checked by extension, size and magic bytes.
-- **Rate limits** (Postgres-backed) on login (per IP and per account), registration, password change, messaging and submissions.
+- **Rate limits** (Postgres-backed) on login (per IP and per account), password change, messaging and submissions.
 - **Other**: Markdown is HTML-escaped before formatting (XSS-tested); server actions get Next's built-in origin check; security headers are set in `next.config.ts`; login takes the same time whether or not the email exists; set-password/reset links are single-use, stored hashed and expire; password changes and resets revoke other sessions; deactivation revokes all sessions immediately; journal text is hidden from admins unless they record a reason, which is audit-logged.
 
 ## Background jobs
@@ -148,7 +148,7 @@ src/server/policy.ts     every authorization decision
 src/server/services/     domain logic: courses, assignments, submissions, learner/teaching read models,
                          notifications, messaging, journal, reminders, jobs, analytics, storage
 src/server/actions/      thin server actions (validate → service → feedback)
-src/app/(auth)/          login, register, set/reset password
+src/app/(auth)/          login, set/reset password
 src/app/(app)/learn      learner area           src/app/(app)/teach   teacher area
 src/app/(app)/admin      super admin area       src/app/api           files, notifications, messages
 tests/                   integration tests against a real Postgres database

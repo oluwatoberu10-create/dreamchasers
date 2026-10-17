@@ -63,7 +63,7 @@ export default async function UsersPage({ searchParams }: { searchParams: Promis
         {rows.length === 0 ? <EmptyState icon="users" title="No users match" /> : (
           <div className="table-wrap">
             <table className="table-dt min-w-[820px]">
-              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Teaching / learning</th><th>Registered</th></tr></thead>
+              <thead><tr><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Teaching / learning</th><th>Added</th></tr></thead>
               <tbody>
                 {rows.map(({ u, enrolled, teaches }) => (
                   <tr key={u.id}>

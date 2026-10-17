@@ -46,7 +46,7 @@ export default async function AdminOverview() {
       )}
 
       <div className="grid grid-cols-2 gap-4 md:grid-cols-3 xl:grid-cols-6">
-        <StatCard label="Registered users" value={formatNumber(m.users)} hint={`${m.deactivated} deactivated`} icon="users" href="/admin/users" definition="Every account, any role or status." />
+        <StatCard label="Users" value={formatNumber(m.users)} hint={`${m.deactivated} deactivated`} icon="users" href="/admin/users" definition="Every account, any role or status." />
         <StatCard label="Learners" value={formatNumber(m.students)} hint={`${m.activeLearners} active in 14 days`} icon="team" href="/admin/users?role=student" definition="Active learner accounts. 'Active' = opened a course or worked on an assignment in the last 14 days." delay={30} />
         <StatCard label="Teachers" value={formatNumber(m.teachers)} hint={`+ ${m.admins} super admin${m.admins === 1 ? "" : "s"}`} icon="graduation" href="/admin/users?role=teacher" delay={60} />
         <StatCard label="Courses" value={m.courses} hint={`${m.publishedCourses} published · ${m.draftCourses} draft · ${m.scheduledCourses} scheduled`} icon="book" href="/admin/courses" definition="Course records in this programme. Published includes scheduled courses whose time has passed." delay={90} />

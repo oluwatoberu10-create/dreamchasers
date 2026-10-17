@@ -34,18 +34,6 @@ export const localDateTimeField = z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{
 export const emailSchema = z.string().trim().toLowerCase().min(3).max(254).pipe(z.email("Enter a valid email address."));
 export const passwordSchema = z.string().min(10, "Use at least 10 characters.").max(200, "That password is too long.");
 
-/**
- * Public registration. Note what is NOT here: there is no `role` field.
- * Anything extra a client posts is stripped by zod, and the insert sets the
- * role explicitly to "student" — see registerAction.
- */
-export const registerSchema = z.object({
-  firstName: reqText(80),
-  lastName: reqText(80),
-  email: emailSchema,
-  password: passwordSchema,
-});
-
 export const loginSchema = z.object({
   email: emailSchema,
   password: z.string().min(1, "Required").max(200),
