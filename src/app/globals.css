@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+/*
+ * Dream Chasers Community — design system.
+ *
+ * Identity: a calm night-sky navy for structure, a confident indigo for
+ * action, and a warm gold "star" accent used sparingly for achievement.
+ * Every colour in the app comes from these tokens; components never use raw
+ * hex values, so light and dark themes stay consistent.
+ */
+
+@theme {
+  --font-sans: var(--font-jakarta), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, monospace;
+
+  --radius-card: 14px;
+  --radius-field: 10px;
+
+  --ease-out-soft: cubic-bezier(0.22, 1, 0.36, 1);
+  --dur-fast: 140ms;
+  --dur-base: 220ms;
+  --dur-slow: 420ms;
+}
+
+:root {
+  color-scheme: light;
+
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f1f2f8;
+  --surface-3: #e6e8f2;
+  --overlay: #ffffff;
+
+  --border: #e2e4ef;
+  --border-strong: #c9cde0;
+
+  --text: #0f1330;
+  --text-muted: #565b78;
+  --text-subtle: #868aa3;
+
+  --brand: #3f4fd8;
+  --brand-hover: #3341c0;
+  --brand-soft: #eceffe;
+  --brand-border: #ccd3fb;
+  --on-brand: #ffffff;
+
+  --star: #c98306;
+  --star-strong: #f5a524;
+  --star-soft: #fff4dc;
+
+  --nav-bg: #141a3a;
+  --nav-text: #c3c8e6;
+  --nav-text-strong: #ffffff;
+  --nav-hover: #1f2752;
+  --nav-active: #2a3470;
+  --nav-border: #232b55;
+
+  --success: #13784c;
+  --success-soft: #e1f5ea;
+  --warning: #9a5b00;
+  --warning-soft: #fdf0d7;
+  --danger: #c02a2a;
+  --danger-soft: #fde8e8;
+  --info: #1764a3;
+  --info-soft: #e3f0fb;
+
+  --chart-1: #3f4fd8;
+  --chart-2: #0f8b8d;
+  --chart-3: #d08a0c;
+  --chart-4: #c2416b;
+  --chart-grid: #e6e8f2;
+
+  --shadow-card: 0 1px 2px rgb(22 26 51 / 0.04), 0 1px 3px rgb(22 26 51 / 0.06);
+  --shadow-raised: 0 6px 16px -4px rgb(22 26 51 / 0.12);
+  --shadow-overlay: 0 24px 48px -12px rgb(22 26 51 / 0.28);
+}
+
+html, body { background: var(--bg); color: var(--text); }
+body { font-family: var(--font-sans); -webkit-font-smoothing: antialiased; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
+.lift { transition: transform var(--dur-base) var(--ease-out-soft), box-shadow var(--dur-base) var(--ease-out-soft), border-color var(--dur-base); }
+.lift:hover { transform: translateY(-2px); box-shadow: var(--shadow-raised); border-color: var(--border-strong); }
+
+.tnum { font-variant-numeric: tabular-nums; }
+
+/* Rendered Markdown (lesson content, instructions, feedback). */
+.prose-dt { font-size: 15px; line-height: 1.7; color: var(--text); overflow-wrap: anywhere; }
+.prose-dt > * + * { margin-top: 0.85em; }
+.prose-dt h2 { font-size: 1.3em; font-weight: 700; margin-top: 1.4em; letter-spacing: -0.01em; }
+.prose-dt h3 { font-size: 1.1em; font-weight: 650; margin-top: 1.2em; }
+.prose-dt h4 { font-size: 1em; font-weight: 650; }
+.prose-dt ul { list-style: disc; padding-left: 1.4em; }
+.prose-dt ol { list-style: decimal; padding-left: 1.4em; }
+.prose-dt li + li { margin-top: 0.3em; }
+.prose-dt a { color: var(--brand); text-decoration: underline; text-underline-offset: 2px; }
+.prose-dt code { font-family: var(--font-mono); font-size: 0.88em; background: var(--surface-2); padding: 0.1em 0.35em; border-radius: 6px; }
+.prose-dt pre { background: var(--surface-2); padding: 0.9em 1em; border-radius: var(--radius-field); overflow-x: auto; }
+.prose-dt pre code { background: none; padding: 0; }
+.prose-dt blockquote { border-left: 3px solid var(--star-strong); padding: 0.2em 0 0.2em 1em; color: var(--text-muted); background: var(--star-soft); border-radius: 0 8px 8px 0; }
+.prose-dt hr { border: 0; border-top: 1px solid var(--border); }
+.prose-sm { font-size: 14px; }
+
+/* Motion — subtle, and disabled for people who ask for less. */
+@keyframes dt-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+@keyframes dt-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes dt-pop { from { opacity: 0; transform: translateY(8px) scale(0.98); } to { opacity: 1; transform: none; } }
+@keyframes dt-fill { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+@keyframes dt-drain { from { transform: scaleX(1); } to { transform: scaleX(0); } }
+@keyframes dt-shimmer { from { background-position: -200% 0; } to { background-position: 200% 0; } }
+.anim-rise { animation: dt-rise var(--dur-slow) var(--ease-out-soft) both; animation-delay: var(--stagger, 0ms); }
+.anim-fade { animation: dt-fade var(--dur-base) ease both; }
+.anim-pop { animation: dt-pop var(--dur-base) var(--ease-out-soft) both; }
+.skeleton { background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface-3) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: dt-shimmer 1.4s infinite linear; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Scroll containers for wide tables on small screens. */
+.table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+.table-dt { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+.table-dt th { text-align: left; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; color: var(--text-subtle); padding: 10px 14px; border-bottom: 1px solid var(--border); white-space: nowrap; background: var(--surface); }
+.table-dt td { padding: 11px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+.table-dt tr:last-child td { border-bottom: 0; }
+.table-dt tbody tr:hover td { background: var(--surface-2); }
