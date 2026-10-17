@@ -11,4 +11,4 @@ async function main() {
   console.log("[db] migrations applied");
 }
 
-main().catch((e) => { console.error("[migrate]", e); process.exit(1); });
+main().catch((e) => { console.error("[migrate]", e instanceof Error && !("cause" in e && e.cause) ? e.message : e); process.exit(1); });

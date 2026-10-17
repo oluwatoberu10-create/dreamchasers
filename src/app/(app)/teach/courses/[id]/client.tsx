@@ -65,18 +65,19 @@ export function ArchiveControl({ courseId, archived, canDelete }: { courseId: st
   );
 }
 
-export function ResourceUploader({ courseId }: { courseId: string }) {
-  const [tab, setTab] = React.useState<"file" | "link">("file");
+export function ResourceUploader({ courseId, uploads }: { courseId: string; uploads: boolean }) {
+  const [tab, setTab] = React.useState<"file" | "link">(uploads ? "file" : "link");
   const [key, setKey] = React.useState(0);
   return (
     <div className="space-y-3">
       <div className="flex gap-1 text-[12.5px] font-semibold">
-        {(["file", "link"] as const).map((t) => (
+        {(uploads ? ["file", "link"] as const : ["link"] as const).map((t) => (
           <button key={t} type="button" onClick={() => setTab(t)} className={cn("rounded-md px-3 py-1.5", tab === t ? "bg-[var(--brand-soft)] text-[var(--brand)]" : "text-[var(--text-muted)] hover:bg-[var(--surface-2)]")}>
             {t === "file" ? "Upload files" : "Add a link or video"}
           </button>
         ))}
       </div>
+      {!uploads && <p className="text-[12.5px] text-[var(--text-muted)]">File uploads aren&apos;t available on this deployment. Put videos on YouTube or Vimeo and files on Google Drive or Dropbox, then add the link here.</p>}
       {tab === "file" ? (
         <ActionForm action={uploadResourcesAction.bind(null, courseId)} className="space-y-3" onSuccess={() => setKey((k) => k + 1)}>
           <input key={key} name="files" type="file" multiple required aria-label="Files"

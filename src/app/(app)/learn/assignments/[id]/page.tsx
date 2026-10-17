@@ -9,6 +9,7 @@ import { improvement } from "@/lib/progress";
 import { cn, formatBytes, formatDateTime, relativeTime } from "@/lib/utils";
 import { attemptFilesFor } from "@/server/services/submissions";
 import { learnerContext } from "../../data";
+import { uploadsAvailable } from "@/server/services/storage";
 import { StartAttempt, WorkEditor } from "./client";
 
 const RESUBMIT_COPY = {
@@ -18,6 +19,7 @@ const RESUBMIT_COPY = {
 } as const;
 
 export default async function AssignmentPage({ params }: { params: Promise<{ id: string }> }) {
+  const uploads = uploadsAvailable();
   const { id } = await params;
   const ctx = await learnerContext();
   if (!ctx.program) notFound();
@@ -73,7 +75,7 @@ export default async function AssignmentPage({ params }: { params: Promise<{ id:
             <Card>
               <CardHeader title={draft.attemptNumber > 1 ? `Attempt ${draft.attemptNumber}` : "Your work"} description={draft.reason ?? (st.isPastDue ? "The deadline has passed — this will be marked as a late submission." : `Due ${formatDateTime(a.dueAt, tz)}`)} />
               <CardBody>
-                <WorkEditor assignmentId={a.id} attemptId={draft.id} body={draft.body} allowText={a.allowText} allowFiles={a.allowFiles}
+                <WorkEditor assignmentId={a.id} attemptId={draft.id} body={draft.body} allowText={a.allowText} allowFiles={a.allowFiles} uploads={uploads}
                   requiredFilesNote={a.requiredFilesNote} files={filesOf(draft.id).map((f) => ({ id: f.id, name: f.originalName, size: formatBytes(f.sizeBytes) }))}
                   late={st.isPastDue && draft.attemptNumber === 1} savedAt={draft.updatedAt.toISOString()} />
               </CardBody>
@@ -82,7 +84,7 @@ export default async function AssignmentPage({ params }: { params: Promise<{ id:
             <Card>
               <CardHeader title="Your work" description={st.isPastDue ? "The deadline has passed, but late work is accepted — it will be marked as late." : `Due ${formatDateTime(a.dueAt, tz)}`} />
               <CardBody>
-                <WorkEditor assignmentId={a.id} attemptId={null} body="" allowText={a.allowText} allowFiles={a.allowFiles} requiredFilesNote={a.requiredFilesNote} files={[]} late={st.isPastDue} savedAt={null} />
+                <WorkEditor assignmentId={a.id} attemptId={null} body="" allowText={a.allowText} allowFiles={a.allowFiles} uploads={uploads} requiredFilesNote={a.requiredFilesNote} files={[]} late={st.isPastDue} savedAt={null} />
               </CardBody>
             </Card>
           ) : st.canStartNewAttempt ? (

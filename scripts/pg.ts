@@ -167,8 +167,17 @@ export function status(): void {
   console.log(isRunning() ? `[pg] running on ${PG_PORT}` : "[pg] stopped");
 }
 
-/** Ensures a DATABASE_URL exists for local commands that need one. */
+/**
+ * Ensures a DATABASE_URL exists for local commands that need one. On Vercel or
+ * CI there is no local cluster, so a missing URL is a configuration error.
+ */
 export function ensureEnv(): string {
+  if (!process.env.DATABASE_URL && (process.env.VERCEL || process.env.CI)) {
+    throw new Error(
+      "DATABASE_URL is not set. Add a Postgres database (e.g. Neon from the Vercel Marketplace) " +
+      "and set DATABASE_URL in Project Settings → Environment Variables, then redeploy.",
+    );
+  }
   if (!process.env.DATABASE_URL) process.env.DATABASE_URL = LOCAL_DATABASE_URL;
   return process.env.DATABASE_URL;
 }

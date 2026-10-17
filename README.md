@@ -33,7 +33,7 @@ The app needs **no external services or API keys** — just Postgres. There is n
 
 ## Running locally
 
-Prerequisites: **Node.js 20+** (tested on 24) and npm. Nothing else.
+Prerequisites: **Node.js 24** and npm. Nothing else.
 
 ```bash
 cd dream-tutors
@@ -119,12 +119,20 @@ Uploads are written to `./.uploads` on the server (override with `LOCAL_UPLOAD_D
 
 ## Deploying
 
-Because files live on the server's disk, deploy to a host with a **persistent disk** (a VPS, Railway or Render with a volume, Fly.io with a volume, etc.). Serverless hosts with an ephemeral filesystem (such as Vercel) would lose uploaded files.
+**On Vercel:**
+
+1. Add a Postgres database: *Project → Storage → Marketplace → Neon* (it sets `DATABASE_URL` for you), or paste any Postgres URL into *Settings → Environment Variables* as `DATABASE_URL`. Use the provider's **pooled** connection string.
+2. Redeploy. The build (`vercel-build`) applies the database migrations, then builds the app. Without `DATABASE_URL` it stops with a message saying what to set.
+3. From your computer, create the first super admin against that database: `DATABASE_URL="<the same URL>" npm run admin:create -- --email you@…`.
+4. In *Admin → Settings*, create the programme.
+
+Vercel's disk is read-only and temporary, so **file uploads are switched off there**. Teachers add videos and documents as links (YouTube, Vimeo, Google Drive, Dropbox), and learners hand in written answers or links.
+
+**On a server with a persistent disk** (a VPS, Railway or Render with a volume, Fly.io with a volume), uploads work and are stored in `./.uploads`:
 
 1. Create a Postgres database and set `DATABASE_URL`.
 2. `npm ci && npm run db:deploy && npm run build && npm start`.
-3. Run `npm run admin:create -- --email you@…` against the production `DATABASE_URL` to create the first super admin.
-4. In *Admin → Settings*, create the programme, add tracks, and assign teachers.
+3. Run `npm run admin:create -- --email you@…` against the production `DATABASE_URL`.
 
 **Never run `db:reset` against production.** It refuses non-local databases by default.
 

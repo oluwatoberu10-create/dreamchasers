@@ -10,8 +10,8 @@ import { removeDraftFileAction, startAttemptAction, workAction } from "@/server/
 
 type DraftFile = { id: string; name: string; size: string };
 
-export function WorkEditor({ assignmentId, attemptId, body, allowText, allowFiles, requiredFilesNote, files, late, savedAt }: {
-  assignmentId: string; attemptId: string | null; body: string; allowText: boolean; allowFiles: boolean;
+export function WorkEditor({ assignmentId, attemptId, body, allowText, allowFiles, uploads, requiredFilesNote, files, late, savedAt }: {
+  assignmentId: string; attemptId: string | null; body: string; allowText: boolean; allowFiles: boolean; uploads: boolean;
   requiredFilesNote: string | null; files: DraftFile[]; late: boolean; savedAt: string | null;
 }) {
   const [text, setText] = React.useState(body);
@@ -40,7 +40,12 @@ export function WorkEditor({ assignmentId, attemptId, body, allowText, allowFile
             </div>
           </div>
         )}
-        {allowFiles && (
+        {allowFiles && !uploads && (
+          <p className="rounded-lg bg-[var(--surface-2)] px-3 py-2 text-[12.5px] text-[var(--text-muted)]">
+            File attachments aren&apos;t available here. {allowText ? "Share your file on Google Drive or Dropbox and paste the link in your written response." : "Ask your teacher how to hand in this work."}
+          </p>
+        )}
+        {allowFiles && uploads && (
           <div>
             <Label htmlFor="files">Attach files</Label>
             {requiredFilesNote && <p className="mt-0.5 text-[12.5px] text-[var(--text-muted)]">{requiredFilesNote}</p>}

@@ -24,7 +24,7 @@
     "test:integration": "vitest run --config vitest.integration.config.ts"
   },
   "engines": {
-    "node": ">=20"
+    "node": "24.x"
   },
   "dependencies": {
     "drizzle-orm": "0.45.2",

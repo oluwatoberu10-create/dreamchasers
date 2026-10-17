@@ -9,7 +9,9 @@ import { validationError } from "@/lib/errors";
 /**
  * File storage. Bytes live in a storage driver; only metadata goes in Postgres.
  *
- * Files are written to local disk under ./.uploads (LOCAL_UPLOAD_DIR).
+ * Files are written to local disk under ./.uploads (LOCAL_UPLOAD_DIR). On
+ * serverless hosts (Vercel) the disk is read-only and wiped between requests,
+ * so uploads are refused there with a clear message rather than lost.
  *
  * Files are never publicly addressable. They are streamed through
  * /api/files/[id], which checks the viewer may see the course or submission
@@ -136,7 +138,14 @@ export type StoredFile = typeof files.$inferSelect;
  * Pass the transaction so the metadata commits with the record it belongs to;
  * if that transaction rolls back, the orphaned object is harmless and private.
  */
+export function uploadsAvailable(): boolean {
+  return !process.env.VERCEL && !process.env.AWS_LAMBDA_FUNCTION_NAME;
+}
+
 export async function storeUpload(file: File, ownerId: string, purpose: Purpose, conn: DbOrTx = db): Promise<StoredFile> {
+  if (!uploadsAvailable()) {
+    throw validationError("File uploads aren't available on this deployment. Add a link instead (YouTube, Google Drive, Dropbox…), or paste your answer as text.");
+  }
   const driverName = activeDriverName();
   const bytes = new Uint8Array(await file.arrayBuffer());
   const contentType = validateUpload(file.name, bytes.byteLength, bytes.subarray(0, 8), purpose);

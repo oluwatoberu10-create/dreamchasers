@@ -14,6 +14,7 @@ import { updateCourseAction } from "@/server/actions/teaching";
 import { canManageCourse } from "@/server/policy";
 import { teacherContext } from "../../data";
 import { CourseForm } from "../course-form";
+import { uploadsAvailable } from "@/server/services/storage";
 import { ArchiveControl, PublishControl, RemoveResource, ResourceUploader, ResolveRepeat } from "./client";
 
 export default async function TeacherCourse({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ created?: string; tab?: string }> }) {
@@ -80,7 +81,7 @@ export default async function TeacherCourse({ params, searchParams }: { params: 
                 ))}
               </ul>
             )}
-            <CardBody><ResourceUploader courseId={id} /></CardBody>
+            <CardBody><ResourceUploader courseId={id} uploads={uploadsAvailable()} /></CardBody>
           </Card>
 
           <Card>
